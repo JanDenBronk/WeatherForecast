@@ -33,26 +33,42 @@ class TableVC: UITableViewController {
             
             self.citiesArray[index] = weather
             self.citiesArray[index].name = self.nameCitiesArray[index]
-            print(self.citiesArray)
             
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
-        
     }
-    
     // MARK: - Table view data source
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 0
-    }
+//    override func numberOfSections(in tableView: UITableView) -> Int {
+//        return 0
+//    }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        return citiesArray.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! ListCell
+        
+        var weather = Weather()
+        
+        weather = citiesArray[indexPath.row]
+        
+        cell.configure(weather: weather)
         return cell
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showDetail" {
+            
+            guard let indexPath = tableView.indexPathForSelectedRow else { return }
+            
+            let cityWeather = citiesArray[indexPath.row]
+            let dstVC = segue.destination as! DetailViewController
+            dstVC.weatherModel = cityWeather
+        }
     }
 }
