@@ -8,35 +8,37 @@
 import UIKit
 
 class TableVC: UITableViewController {
+    
+    let emptyCity = Weather()
+    
+    var citiesArray = [Weather]()
+    let nameCitiesArray = ["Якутск", "Москва", "Санкт-Петербург"]
+    
+    let networkWeather = NetworkWeather()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        fetchWeather()
+        if citiesArray.isEmpty {
+            citiesArray = Array(repeating: emptyCity, count: nameCitiesArray.count)
+        }
+        
+        addCities()
         
     }
     
-    func fetchWeather() {
+    func addCities() {
         
-        let urlPlace: String = "https://api.weather.yandex.ru/v2/forecast?lat=62.027221&lon=129.732178"
-        guard let url = URL(string: urlPlace) else { return }
-        
-        var request = URLRequest(url: url, timeoutInterval: Double.infinity)
-        request.addValue("c35120f4-0e6b-4304-a0d8-6a362886eb0e", forHTTPHeaderField: "X-Yandex-API-Key")
-        request.httpMethod = "get"
-        
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            guard let data = data else {
-                print(String(describing: error))
-                return
-            }
-            print(String(data: data, encoding: .utf8)!)
+        getCityWeather(citiesArray: self.nameCitiesArray) { (index, weather) in
+            
+            self.citiesArray[index] = weather
+            self.citiesArray[index].name = self.nameCitiesArray[index]
+            print(self.citiesArray)
+            
         }
         
-        task.resume()
-        
     }
-
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
